@@ -1,10 +1,26 @@
 #include "gspgrouped.h"
 
+//static
+gspGrouped * gspGrouped::_interruptFirstInstance=nullptr;
+
 gspGrouped::gspGrouped() {
     //gspGrouped::register_instance(this); //calling static registration method
 }
 
 gspGrouped::~gspGrouped() {}
+
+//static
+void gspGrouped::_isr_startCheckAll(gspGrouped * pInstance) {
+		gspGrouped::_interruptFirstInstance=pInstance;
+	    TIMSK2 |= (1 << TOIE2);	
+}
+
+//static
+void gspGrouped::_ISR() {
+	if (gspGrouped::_interruptFirstInstance != nullptr) {
+		gspGrouped::_isrAll(gspGrouped::_interruptFirstInstance);
+	}
+}
 
 // static method to register this switch 
 int gspGrouped::register_instance(gspGrouped * newInstance) {
@@ -96,6 +112,29 @@ void gspGrouped::checkAll(gspGrouped * pInstance) {
 }
 
 //static method to go check all switch instances (called from loop function)
+void gspGrouped::_isrAll(gspGrouped * pInstance) {
+
+	// loop while pSwitch is not null
+	while (1) {
+
+		// if indeed there are no more switches to check,
+		// we are done, otherwise we check the instance.
+		if (pInstance==nullptr) 
+			//we are done
+			return;
+		else
+			// check the switch instance
+			if (!pInstance->_isr())
+				break;
+
+		// set pSwitch to the next switch in the list
+		// if there are no more switches, this will be set to nullptr
+		pInstance=pInstance->getNextInstance();
+	}
+}
+
+
+//static method to go check all switch instances (called from loop function)
 void gspGrouped::resetAll(gspGrouped * pInstance) {
 
 	// loop while pSwitch is not null
@@ -115,3 +154,9 @@ void gspGrouped::resetAll(gspGrouped * pInstance) {
 		pInstance=pInstance->getNextInstance();
 	}
 }
+
+
+ISR(TIMER2_OVF_vect) {
+    gspGrouped::_ISR();
+}
+

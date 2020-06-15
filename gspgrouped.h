@@ -12,9 +12,14 @@ class gspGrouped {
 
         static void checkAll(gspGrouped* firstInstance);
         static void resetAll(gspGrouped* firstInstance);
+        static void  _isrAll(gspGrouped * firstInstance);
 
         virtual bool check(){return true;};
         virtual void reset(){};
+        virtual bool _isr(){return true;}
+
+        static void _isr_startCheckAll(gspGrouped * pInstance);
+        static void _ISR();
 
         virtual void setFirstInstance(gspGrouped *)=0;
         virtual gspGrouped * getFirstInstance()=0;
@@ -32,11 +37,13 @@ class gspGrouped {
 
     private:
 
+        static gspGrouped * _interruptFirstInstance; // specifically for interrupt driven checker.
 
-
-        gspGrouped * nextInstance = nullptr;
+        gspGrouped * nextInstance = nullptr; //manual checker
 
         uint8_t instanceId=0;
 };
+
+
 
 #endif
