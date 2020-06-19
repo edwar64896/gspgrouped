@@ -3,6 +3,9 @@
 //static
 gspGrouped * gspGrouped::_interruptFirstInstance=nullptr;
 
+//static
+Stream & gspGrouped::gspStream=Serial;
+
 gspGrouped::gspGrouped() {
     //gspGrouped::register_instance(this); //calling static registration method
 }
@@ -153,6 +156,12 @@ void gspGrouped::resetAll(gspGrouped * pInstance) {
 		// if there are no more switches, this will be set to nullptr
 		pInstance=pInstance->getNextInstance();
 	}
+}
+
+char gspGrouped::getChar()// Get a character from the Net buffer
+{
+  while (!gspGrouped::gspStream.available()); // wait for data
+  return ((char)gspNetResponse::gspStream.read()); // Thanks Doug
 }
 
 

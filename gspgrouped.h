@@ -1,7 +1,7 @@
 #ifndef GSP_GROUPED
 #define GSP_GROUPED
 
-#include "Arduino.h"
+#include <Arduino.h>
 
 class gspGrouped {
 
@@ -27,6 +27,12 @@ class gspGrouped {
         uint8_t getInstanceId() {return instanceId;}
         void setInstanceId(uint8_t _instanceId) {instanceId=_instanceId;}
         static int register_instance(gspGrouped * newInstance);
+
+
+        // stream management functions
+        static void setup(Stream& _stream = Serial) {gspGrouped::gspStream = _stream;}
+        static Stream & gspStream;
+        static char gspGrouped::getChar();
 
     protected:
         // switch list management functions
