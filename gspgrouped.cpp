@@ -160,8 +160,8 @@ void gspGrouped::resetAll(gspGrouped * pInstance) {
 
 char gspGrouped::getChar()// Get a character from the Net buffer
 {
-  while (!gspGrouped::gspStream.available()); // wait for data
-  return ((char)gspNetResponse::gspStream.read()); // Thanks Doug
+  while (!gspStream.available()); // wait for data
+  return ((char)gspStream.read()); // Thanks Doug
 }
 
 

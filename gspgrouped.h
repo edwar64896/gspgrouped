@@ -32,7 +32,7 @@ class gspGrouped {
         // stream management functions
         static void setup(Stream& _stream = Serial) {gspGrouped::gspStream = _stream;}
         static Stream & gspStream;
-        static char gspGrouped::getChar();
+        static char getChar();
 
     protected:
         // switch list management functions
