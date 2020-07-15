@@ -6,6 +6,9 @@ gspGrouped * gspGrouped::_interruptFirstInstance=nullptr;
 //static
 Stream & gspGrouped::gspStream=Serial;
 
+uint32_t gspGrouped::_tmrCtr=0;
+uint32_t gspGrouped::_timerCap=128;
+
 gspGrouped::gspGrouped() {
     //gspGrouped::register_instance(this); //calling static registration method
 }
@@ -13,15 +16,22 @@ gspGrouped::gspGrouped() {
 gspGrouped::~gspGrouped() {}
 
 //static
+/*
 void gspGrouped::_isr_startCheckAll(gspGrouped * pInstance) {
 		gspGrouped::_interruptFirstInstance=pInstance;
 	    TIMSK2 |= (1 << TOIE2);	
 }
+*/
 
+void gspGrouped::startTimer() {
+	TIMSK2 |= (1 << TOIE2);
+}
 //static
 void gspGrouped::_ISR() {
-	if (gspGrouped::_interruptFirstInstance != nullptr) {
-		gspGrouped::_isrAll(gspGrouped::_interruptFirstInstance);
+	if (gspGrouped::_isr_checking) {
+		if (gspGrouped::_interruptFirstInstance != nullptr) {
+			gspGrouped::_isrAll(gspGrouped::_interruptFirstInstance);
+		}
 	}
 }
 

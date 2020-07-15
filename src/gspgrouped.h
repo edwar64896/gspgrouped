@@ -18,7 +18,7 @@ class gspGrouped {
         virtual void reset(){};
         virtual bool _isr(){return true;}
 
-        static void _isr_startCheckAll(gspGrouped * pInstance);
+        //static void _isr_startCheckAll(gspGrouped * pInstance);
         static void _ISR();
 
         virtual void setFirstInstance(gspGrouped *)=0;
@@ -33,6 +33,10 @@ class gspGrouped {
         static void setup(Stream& _stream = Serial) {gspGrouped::gspStream = _stream;}
         static Stream & gspStream;
         static char getChar();
+        static void setInitialInstance(gspGrouped * instance) { gspGrouped::_interruptFirstInstance = instance;}
+
+        static void startTimer();
+        static void setTimerCap(uint32_t tcap) {gspGrouped::_timerCap = tcap;}
 
     protected:
         // switch list management functions
@@ -40,10 +44,14 @@ class gspGrouped {
         void setNextInstance(gspGrouped * nextInstance);
         gspGrouped * getNextInstance();
         void backToStart();
+        static bool _isr_checking;
+
+        static gspGrouped * _interruptFirstInstance; // specifically for interrupt driven checker.
 
     private:
 
-        static gspGrouped * _interruptFirstInstance; // specifically for interrupt driven checker.
+        static uint32_t _tmrCtr;
+        static uint32_t _timerCap;
 
         gspGrouped * nextInstance = nullptr; //manual checker
 
