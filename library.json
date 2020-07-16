@@ -1,0 +1,25 @@
+{
+    "name": "gspswitch",
+    "keywords": "switch",
+    "description": "Arduino library for managing multiple instances of other gspclasses.",
+    "authors":
+    {
+        "name": "Mark Edwards",
+        "email": "mark.p.edwards@gmail.com",
+        "url": "www.greensideproductions.com.au"
+    },
+    "version":"0.3",
+    "repository":
+    {
+        "type": "git",
+        "url": "https://github.com/edwar64896/gspgrouped#0.3"
+    },
+    "frameworks": "arduino",
+    "platforms": "atmelavr",
+    "dependencies": [
+        {
+            "name":"functional-avr",
+            "version":"https://github.com/edwar64896/functional-avr#0.1"
+        }
+    ]
+}
