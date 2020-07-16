@@ -34,9 +34,8 @@ class gspGrouped {
         static Stream & gspStream;
         static char getChar();
         static void setInitialInstance(gspGrouped * instance) { gspGrouped::_interruptFirstInstance = instance;}
-
         static void startTimer();
-        static void setTimerCap(uint32_t tcap) {gspGrouped::_timerCap = tcap;}
+
 
     protected:
         // switch list management functions
@@ -49,9 +48,6 @@ class gspGrouped {
         static gspGrouped * _interruptFirstInstance; // specifically for interrupt driven checker.
 
     private:
-
-        static uint32_t _tmrCtr;
-        static uint32_t _timerCap;
 
         gspGrouped * nextInstance = nullptr; //manual checker
 

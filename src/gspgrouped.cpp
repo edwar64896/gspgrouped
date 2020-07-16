@@ -6,8 +6,10 @@ gspGrouped * gspGrouped::_interruptFirstInstance=nullptr;
 //static
 Stream & gspGrouped::gspStream=Serial;
 
-uint32_t gspGrouped::_tmrCtr=0;
-uint32_t gspGrouped::_timerCap=128;
+//uint32_t gspGrouped::_tmrCtr	=0;
+//uint32_t gspGrouped::_timerCap	=128;
+
+bool gspGrouped::_isr_checking = false;
 
 gspGrouped::gspGrouped() {
     //gspGrouped::register_instance(this); //calling static registration method
@@ -33,6 +35,10 @@ void gspGrouped::_ISR() {
 			gspGrouped::_isrAll(gspGrouped::_interruptFirstInstance);
 		}
 	}
+
+	//if (!(++gspGrouped::_tmrCtr % gspGrouped::_timerCap)) {
+	//}
+	
 }
 
 // static method to register this switch 
@@ -40,10 +46,10 @@ int gspGrouped::register_instance(gspGrouped * newInstance) {
 
 	int ctr=0;
 
-	// going to use pSwitch to walk the list
+	// going to use pInstance to walk the list
 	gspGrouped* pInstance=nullptr;
 
-	// if there are no switches registered at all
+	// if there are no instances registered at all
 	// we set this to the first one then leave.
 	if (newInstance->getFirstInstance()==nullptr) {
 		newInstance->setFirstInstance(newInstance) ;
@@ -105,7 +111,7 @@ gspGrouped * gspGrouped::getNextInstance() {
 //static method to go check all switch instances (called from loop function)
 void gspGrouped::checkAll(gspGrouped * pInstance) {
 
-	// loop while pSwitch is not null
+	// loop while pInstance is not null
 	while (1) {
 
 		// if indeed there are no more switches to check,
@@ -114,34 +120,34 @@ void gspGrouped::checkAll(gspGrouped * pInstance) {
 			//we are done
 			return;
 		else
-			// check the switch instance
+			// check the instance
 			if (!pInstance->check())
 				break;
 
-		// set pSwitch to the next switch in the list
-		// if there are no more switches, this will be set to nullptr
+		// set pSwitch to the next instance in the list
+		// if there are no more instance, this will be set to nullptr
 		pInstance=pInstance->getNextInstance();
 	}
 }
 
-//static method to go check all switch instances (called from loop function)
+//static method to go check all instances (called from loop function)
 void gspGrouped::_isrAll(gspGrouped * pInstance) {
 
-	// loop while pSwitch is not null
+	// loop while pInstance is not null
 	while (1) {
 
-		// if indeed there are no more switches to check,
+		// if indeed there are no more instances to check,
 		// we are done, otherwise we check the instance.
 		if (pInstance==nullptr) 
 			//we are done
 			return;
 		else
-			// check the switch instance
+			// check the instance
 			if (!pInstance->_isr())
 				break;
 
-		// set pSwitch to the next switch in the list
-		// if there are no more switches, this will be set to nullptr
+		// set pInstance to the next switch in the list
+		// if there are no more instances, this will be set to nullptr
 		pInstance=pInstance->getNextInstance();
 	}
 }
