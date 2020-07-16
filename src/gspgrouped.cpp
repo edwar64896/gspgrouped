@@ -19,6 +19,7 @@ gspGrouped::~gspGrouped() {}
 void gspGrouped::startTimer() {
 	TIMSK2 |= (1 << TOIE2);
 }
+
 //static
 void gspGrouped::_ISR() {
 	if (gspGrouped::_isr_checking) {
