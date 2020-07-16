@@ -2,25 +2,19 @@
 
 //static
 gspGrouped * gspGrouped::_interruptFirstInstance=nullptr;
-
+gspGrouped * gspGrouped::_interruptFirstInstance_fast=nullptr;
+gspGrouped * gspGrouped::_interruptFirstInstance_slow=nullptr;
 //static
 Stream & gspGrouped::gspStream=Serial;
 
 bool gspGrouped::_isr_checking = false;
 volatile bool gspGrouped::_flashState = false;
+volatile bool gspGrouped::_flashStateSlow = false;
+volatile bool gspGrouped::_flashStateFast = false;
 volatile uint32_t gspGrouped::_flashStateC1 = 0;
 
-gspGrouped::gspGrouped() {
-
-}
-
-gspGrouped::~gspGrouped() {}
-
-void gspGrouped::startTimer() {
-	TIMSK2 |= (1 << TOIE2);
-}
-
-//static
+//static - called from the master ISR
+// launches the entire linked list checking.
 void gspGrouped::_ISR() {
 	if (gspGrouped::_isr_checking) {
 		if (gspGrouped::_interruptFirstInstance != nullptr) {
@@ -29,7 +23,29 @@ void gspGrouped::_ISR() {
 	}
 }
 
+//static - called from the master ISR
+// launches the entire linked list checking.
+void gspGrouped::_ISR_fast() {
+	if (gspGrouped::_isr_checking) {
+		if (gspGrouped::_interruptFirstInstance_fast != nullptr) {
+			gspGrouped::_isrAll(gspGrouped::_interruptFirstInstance_fast);
+		}
+	}
+}
+
+//static - called from the master ISR
+// launches the entire linked list checking.
+void gspGrouped::_ISR_slow() {
+	if (gspGrouped::_isr_checking) {
+		if (gspGrouped::_interruptFirstInstance_slow != nullptr) {
+			gspGrouped::_isrAll(gspGrouped::_interruptFirstInstance_slow);
+		}
+	}
+}
+
 // static method to register this switch 
+//
+// This builds a linked list across all the instances in the group.
 int gspGrouped::register_instance(gspGrouped * newInstance) {
 
 	int ctr=0;
@@ -173,8 +189,14 @@ ISR(TIMER2_OVF_vect) {
 
     gspGrouped::_ISR();
 
-	if (!(++gspGrouped::_flashStateC1 % gspGrouped_FLASHSTATE_CAP))
-	gspGrouped::_flashState = !gspGrouped::_flashState;
+	if (!(++gspGrouped::_flashStateC1 % gspGrouped_FLASHSTATE_CAP)) {
+		gspGrouped::_ISR_fast();
+		gspGrouped::_flashStateFast = !gspGrouped::_flashStateFast;
+	}
+
+	if (gspGrouped::_flashStateFast) {
+		gspGrouped::_ISR_slow();
+	}
 
 }
 

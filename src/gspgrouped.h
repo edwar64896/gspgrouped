@@ -3,14 +3,14 @@
 
 #include <Arduino.h>
 
-#define gspGrouped_FLASHSTATE_CAP 128
+#define gspGrouped_FLASHSTATE_CAP 64
 
 class gspGrouped {
 
     public:
 
-        gspGrouped();
-        ~gspGrouped();
+        gspGrouped(){};
+        ~gspGrouped(){};
 
         static void checkAll(gspGrouped* firstInstance);
         static void resetAll(gspGrouped* firstInstance);
@@ -22,6 +22,8 @@ class gspGrouped {
 
         //static void _isr_startCheckAll(gspGrouped * pInstance);
         static void _ISR();
+        static void _ISR_fast();
+        static void _ISR_slow();
 
         virtual void setFirstInstance(gspGrouped *)=0;
         virtual gspGrouped * getFirstInstance()=0;
@@ -35,13 +37,15 @@ class gspGrouped {
         static void setup(Stream& _stream = Serial) {gspGrouped::gspStream = _stream;}
         static Stream & gspStream;
         static char getChar();
-        static void setInitialInstance(gspGrouped * instance) { gspGrouped::_interruptFirstInstance = instance;}
-        static void startTimer();
+        static void _isr_setInitialInstance     (gspGrouped * instance) { gspGrouped::_interruptFirstInstance       = instance;}
+        static void _isr_setInitialInstance_fast(gspGrouped * instance) { gspGrouped::_interruptFirstInstance_fast  = instance;}
+        static void _isr_setInitialInstance_slow(gspGrouped * instance) { gspGrouped::_interruptFirstInstance_slow  = instance;}
+        static void _isr_startTimer() {	TIMSK2 |= (1 << TOIE2); }
 
-        
-        volatile static bool _flashState;
-        volatile static uint32_t _flashStateC1;
-
+        volatile static bool        _flashStateFast;
+        volatile static bool        _flashStateSlow;
+        volatile static bool        _flashState;
+        volatile static uint32_t    _flashStateC1;
 
     protected:
         // switch list management functions
@@ -51,7 +55,9 @@ class gspGrouped {
         void backToStart();
         static bool _isr_checking;
 
-        static gspGrouped * _interruptFirstInstance; // specifically for interrupt driven checker.
+        static gspGrouped * _interruptFirstInstance; // specifically for standard interrupt driven checker.
+        static gspGrouped * _interruptFirstInstance_fast; // specifically for fast interrupt driven checker.
+        static gspGrouped * _interruptFirstInstance_slow; // specifically for slow interrupt driven checker.
 
     private:
 
