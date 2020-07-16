@@ -6,24 +6,15 @@ gspGrouped * gspGrouped::_interruptFirstInstance=nullptr;
 //static
 Stream & gspGrouped::gspStream=Serial;
 
-//uint32_t gspGrouped::_tmrCtr	=0;
-//uint32_t gspGrouped::_timerCap	=128;
-
 bool gspGrouped::_isr_checking = false;
+volatile bool gspGrouped::_flashState = false;
+volatile uint32_t gspGrouped::_flashStateC1 = 0;
 
 gspGrouped::gspGrouped() {
-    //gspGrouped::register_instance(this); //calling static registration method
+
 }
 
 gspGrouped::~gspGrouped() {}
-
-//static
-/*
-void gspGrouped::_isr_startCheckAll(gspGrouped * pInstance) {
-		gspGrouped::_interruptFirstInstance=pInstance;
-	    TIMSK2 |= (1 << TOIE2);	
-}
-*/
 
 void gspGrouped::startTimer() {
 	TIMSK2 |= (1 << TOIE2);
@@ -35,10 +26,6 @@ void gspGrouped::_ISR() {
 			gspGrouped::_isrAll(gspGrouped::_interruptFirstInstance);
 		}
 	}
-
-	//if (!(++gspGrouped::_tmrCtr % gspGrouped::_timerCap)) {
-	//}
-	
 }
 
 // static method to register this switch 
@@ -182,6 +169,11 @@ char gspGrouped::getChar()// Get a character from the Net buffer
 
 
 ISR(TIMER2_OVF_vect) {
+
     gspGrouped::_ISR();
+
+	if (!(++gspGrouped::_flashStateC1 % gspGrouped_FLASHSTATE_CAP))
+	gspGrouped::_flashState = !gspGrouped::_flashState;
+
 }
 

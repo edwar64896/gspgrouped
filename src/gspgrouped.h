@@ -3,6 +3,8 @@
 
 #include <Arduino.h>
 
+#define gspGrouped_FLASHSTATE_CAP 128
+
 class gspGrouped {
 
     public:
@@ -35,6 +37,10 @@ class gspGrouped {
         static char getChar();
         static void setInitialInstance(gspGrouped * instance) { gspGrouped::_interruptFirstInstance = instance;}
         static void startTimer();
+
+        
+        volatile static bool _flashState;
+        volatile static uint32_t _flashStateC1;
 
 
     protected:
