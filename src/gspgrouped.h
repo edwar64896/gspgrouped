@@ -37,6 +37,8 @@ class gspGrouped {
         static void setup(Stream& _stream = Serial) {gspGrouped::gspStream = _stream;}
         static Stream & gspStream;
         static char getChar();
+        static void setInitialInstance (gspGrouped * instance) { gspGrouped::_isr_setInitialInstance (instance);}
+        static void startTimer() {_isr_startTimer();}
         static void _isr_setInitialInstance     (gspGrouped * instance) { gspGrouped::_interruptFirstInstance       = instance;}
         static void _isr_setInitialInstance_fast(gspGrouped * instance) { gspGrouped::_interruptFirstInstance_fast  = instance;}
         static void _isr_setInitialInstance_slow(gspGrouped * instance) { gspGrouped::_interruptFirstInstance_slow  = instance;}

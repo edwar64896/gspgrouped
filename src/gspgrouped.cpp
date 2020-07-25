@@ -192,10 +192,12 @@ ISR(TIMER2_OVF_vect) {
 	if (!(++gspGrouped::_flashStateC1 % gspGrouped_FLASHSTATE_CAP)) {
 		gspGrouped::_ISR_fast();
 		gspGrouped::_flashStateFast = !gspGrouped::_flashStateFast;
+		gspGrouped::_flashState = gspGrouped::_flashStateFast;
 	}
 
 	if (gspGrouped::_flashStateFast) {
 		gspGrouped::_ISR_slow();
+		gspGrouped::_flashStateSlow = !gspGrouped::_flashStateSlow;
 	}
 
 }
